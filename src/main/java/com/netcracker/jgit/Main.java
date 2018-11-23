@@ -5,7 +5,6 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
 import java.util.*;
@@ -22,8 +21,7 @@ public class Main {
         String locationName = scanner.nextLine();
 
         Path sourcePath = Paths.get("mockup//london//bg");
-        List<Path> collect = Arrays
-                .stream(Objects.requireNonNull(sourcePath.toFile().listFiles()))
+        List<Path> collect = Arrays.stream(Objects.requireNonNull(sourcePath.toFile().listFiles()))
                 .filter((file -> !file.isDirectory()))
                 .map(file -> Paths.get(file.getAbsolutePath()))
                 .collect(Collectors.toList());
@@ -31,16 +29,12 @@ public class Main {
         addLocationOnRepository(locationName, collect);
     }
 
-    public static void addLocationOnRepository(String locationName, List<Path> files) throws GitAPIException, IOException{
-        File localPath = File.createTempFile("testJGitRepository", "");
-        if (!localPath.delete()) {
-            throw new IOException("Could not delete temporary file " + localPath);
-        }
-
+    private static void addLocationOnRepository(String locationName, List<Path> files) throws GitAPIException, IOException{
+        Path localPath = Files.createTempDirectory("testJGitRepository");
         System.out.println("Cloning from " + REMOTE_URL + " to " + localPath);
         try (Git result = Git.cloneRepository()
                 .setURI(REMOTE_URL)
-                .setDirectory(localPath)
+                .setDirectory(localPath.toFile())
                 .call()) {
             System.out.println("Having repository: " + result.getRepository().getDirectory());
 
@@ -60,6 +54,6 @@ public class Main {
             result.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(USERNAME, PASSWORD)).call();
             System.out.println("Pushed from repository: " + result.getRepository().getDirectory() + " to remote repository at " + REMOTE_URL);
         }
-        FileUtils.deleteDirectory(localPath);
+        FileUtils.deleteDirectory(localPath.toFile());
     }
 }
