@@ -6,10 +6,8 @@ import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
 
 import java.io.File;
-import java.io.FilenameFilter;
 import java.io.IOException;
 import java.nio.file.*;
-import java.nio.file.attribute.BasicFileAttributes;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -30,15 +28,7 @@ public class Main {
                 .map(file -> Paths.get(file.getAbsolutePath()))
                 .collect(Collectors.toList());
 
-        for (Path path : collect) {
-            System.out.println(path.toString());
-        }
-
-        String strTargetPath = "mockup//" + locationName + "//bg";
-        Path directory = Files.createDirectories(Paths.get(strTargetPath));
-        // Files.createFile(Paths.get(strTargetPath + "//" + "file.txt"));
-        Files.copy(sourcePath.resolve("file.txt"), Paths.get(strTargetPath + "//" + "file.txt"));
-        // addOnRepository();
+        addLocationOnRepository(locationName, collect);
     }
 
     public static void addLocationOnRepository(String locationName, List<Path> files) throws GitAPIException, IOException{
@@ -54,14 +44,18 @@ public class Main {
                 .call()) {
             System.out.println("Having repository: " + result.getRepository().getDirectory());
 
-            File myFile = new File(result.getRepository().getDirectory().getParent(), "testfile");
-            if (!myFile.createNewFile()) {
-                throw new IOException("Could not create file " + myFile);
+            String strLocationFolder = "//mockup//" + locationName + "//bg";
+            String strTargetFolder = result.getRepository().getDirectory().getParent() + strLocationFolder;
+            Path directory = Files.createDirectories(Paths.get(strTargetFolder));
+            for(Path source : files){
+                Path target = directory.resolve(source.getFileName());
+                Files.copy(source, target);
             }
 
-            result.add().addFilepattern("testfile").call();
-            result.commit().setMessage("Added testfile").call();
-            System.out.println("Committed file " + myFile + " to repository at " + result.getRepository().getDirectory());
+            result.add().addFilepattern(".").call();
+
+            result.commit().setMessage("Added files").call();
+            System.out.println("Committed files to repository at " + result.getRepository().getDirectory());
 
             result.push().setCredentialsProvider(new UsernamePasswordCredentialsProvider(USERNAME, PASSWORD)).call();
             System.out.println("Pushed from repository: " + result.getRepository().getDirectory() + " to remote repository at " + REMOTE_URL);
