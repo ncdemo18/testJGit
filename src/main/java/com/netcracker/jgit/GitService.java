@@ -22,7 +22,7 @@ public class GitService {
 
     private static final String REMOTE_URL = "https://github.com/ncdemo18/testJGitRepository.git";
     private static final String USERNAME = "ncdemo18";
-    private static final String PASSWORD = "123Abc++";
+    private static final String PASSWORD = "****";
 
     @Autowired
     private ValidateLocationService validateService;
