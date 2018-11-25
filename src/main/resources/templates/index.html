@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>Control panel</title>
+    <link rel="stylesheet" type="text/css">
+</head>
+<body>
+<form method="post" enctype="multipart/form-data" action="/addLocationFiles">
+    <label for="name-location">Location name:</label>
+    <br/>
+    <input type="text" name="name-location" id="name-location">
+    <br/>
+    <label for="files">File to upload:</label>
+    <br/>
+    <input type="file" name="files" id="files" multiple>
+    <br/> <br/>
+    <input type="submit" value="Upload">
+</form>
+</body>
+</html>
